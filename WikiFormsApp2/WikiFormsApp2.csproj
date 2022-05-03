@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Information.cs" />
     <Compile Include="WikiFormsApp2.cs">
       <SubType>Form</SubType>
     </Compile>
