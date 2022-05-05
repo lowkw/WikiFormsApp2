@@ -28,8 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("Name");
-            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("Category");
             this.buttonAdd = new System.Windows.Forms.Button();
             this.buttonDel = new System.Windows.Forms.Button();
             this.buttonEdit = new System.Windows.Forms.Button();
@@ -37,9 +35,11 @@
             this.comboBoxCategory = new System.Windows.Forms.ComboBox();
             this.radioButtonLinear = new System.Windows.Forms.RadioButton();
             this.radioButtonNonLinear = new System.Windows.Forms.RadioButton();
-            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.textBoxDefinition = new System.Windows.Forms.TextBox();
             this.groupBoxStructure = new System.Windows.Forms.GroupBox();
             this.listView = new System.Windows.Forms.ListView();
+            this.columnHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeaderCategory = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.LabelName = new System.Windows.Forms.Label();
             this.LabelCategory = new System.Windows.Forms.Label();
             this.LabelDefinition = new System.Windows.Forms.Label();
@@ -47,8 +47,6 @@
             this.buttonSearch = new System.Windows.Forms.Button();
             this.buttonOpen = new System.Windows.Forms.Button();
             this.buttonSave = new System.Windows.Forms.Button();
-            this.columnHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeaderCategory = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.groupBoxStructure.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -60,6 +58,7 @@
             this.buttonAdd.TabIndex = 0;
             this.buttonAdd.Text = "ADD";
             this.buttonAdd.UseVisualStyleBackColor = true;
+            this.buttonAdd.Click += new System.EventHandler(this.buttonAdd_Click);
             // 
             // buttonDel
             // 
@@ -101,7 +100,6 @@
             this.radioButtonLinear.Name = "radioButtonLinear";
             this.radioButtonLinear.Size = new System.Drawing.Size(54, 17);
             this.radioButtonLinear.TabIndex = 5;
-            this.radioButtonLinear.TabStop = true;
             this.radioButtonLinear.Text = "Linear";
             this.radioButtonLinear.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage;
             this.radioButtonLinear.UseVisualStyleBackColor = true;
@@ -109,21 +107,21 @@
             // radioButtonNonLinear
             // 
             this.radioButtonNonLinear.AutoSize = true;
+            this.radioButtonNonLinear.Cursor = System.Windows.Forms.Cursors.Default;
             this.radioButtonNonLinear.Location = new System.Drawing.Point(94, 27);
             this.radioButtonNonLinear.Name = "radioButtonNonLinear";
             this.radioButtonNonLinear.Size = new System.Drawing.Size(77, 17);
             this.radioButtonNonLinear.TabIndex = 6;
-            this.radioButtonNonLinear.TabStop = true;
             this.radioButtonNonLinear.Text = "Non-Linear";
             this.radioButtonNonLinear.UseVisualStyleBackColor = true;
             // 
-            // textBox2
+            // textBoxDefinition
             // 
-            this.textBox2.Location = new System.Drawing.Point(12, 193);
-            this.textBox2.Multiline = true;
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(246, 195);
-            this.textBox2.TabIndex = 7;
+            this.textBoxDefinition.Location = new System.Drawing.Point(12, 193);
+            this.textBoxDefinition.Multiline = true;
+            this.textBoxDefinition.Name = "textBoxDefinition";
+            this.textBoxDefinition.Size = new System.Drawing.Size(246, 195);
+            this.textBoxDefinition.TabIndex = 7;
             // 
             // groupBoxStructure
             // 
@@ -142,15 +140,23 @@
             this.columnHeaderName,
             this.columnHeaderCategory});
             this.listView.HideSelection = false;
-            this.listView.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1,
-            listViewItem2});
             this.listView.Location = new System.Drawing.Point(279, 41);
             this.listView.Name = "listView";
             this.listView.Size = new System.Drawing.Size(291, 377);
             this.listView.TabIndex = 9;
             this.listView.UseCompatibleStateImageBehavior = false;
+            this.listView.View = System.Windows.Forms.View.Details;
             this.listView.SelectedIndexChanged += new System.EventHandler(this.listView_SelectedIndexChanged);
+            // 
+            // columnHeaderName
+            // 
+            this.columnHeaderName.Text = "Name";
+            this.columnHeaderName.Width = 100;
+            // 
+            // columnHeaderCategory
+            // 
+            this.columnHeaderCategory.Text = "Category";
+            this.columnHeaderCategory.Width = 100;
             // 
             // LabelName
             // 
@@ -213,16 +219,6 @@
             this.buttonSave.Text = "Save";
             this.buttonSave.UseVisualStyleBackColor = true;
             // 
-            // columnHeaderName
-            // 
-            this.columnHeaderName.Text = "Name";
-            this.columnHeaderName.Width = 20;
-            // 
-            // columnHeaderCategory
-            // 
-            this.columnHeaderCategory.Text = "Category";
-            this.columnHeaderCategory.Width = 20;
-            // 
             // WikiFormsApp2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -237,7 +233,7 @@
             this.Controls.Add(this.LabelName);
             this.Controls.Add(this.listView);
             this.Controls.Add(this.groupBoxStructure);
-            this.Controls.Add(this.textBox2);
+            this.Controls.Add(this.textBoxDefinition);
             this.Controls.Add(this.comboBoxCategory);
             this.Controls.Add(this.textBoxName);
             this.Controls.Add(this.buttonEdit);
@@ -245,6 +241,7 @@
             this.Controls.Add(this.buttonAdd);
             this.Name = "WikiFormsApp2";
             this.Text = "Data Structures Wiki";
+            this.Load += new System.EventHandler(this.WikiFormsApp2_Load);
             this.groupBoxStructure.ResumeLayout(false);
             this.groupBoxStructure.PerformLayout();
             this.ResumeLayout(false);
@@ -261,7 +258,7 @@
         private System.Windows.Forms.ComboBox comboBoxCategory;
         private System.Windows.Forms.RadioButton radioButtonLinear;
         private System.Windows.Forms.RadioButton radioButtonNonLinear;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox textBoxDefinition;
         private System.Windows.Forms.GroupBox groupBoxStructure;
         private System.Windows.Forms.ListView listView;
         private System.Windows.Forms.Label LabelName;

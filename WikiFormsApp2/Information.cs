@@ -6,12 +6,19 @@ using System.Threading.Tasks;
 
 namespace WikiFormsApp2
 {
-    class Information
+    /* 6.1 Create a separate class file to hold the four data items of the Data Structure (use the Data Structure
+     * Matrix as a guide). Use auto-implemented properties for the fields which must be of type “string”. Save the 
+     * class as “Information.cs”.
+    */
+    class Information : IComparable<Information>
     {
         private string name;
         private string category;
         private string structure;
         private string definition;
+
+        public Information()
+        { }
 
         public Information(string name, string category, string structure, string definition)
         {
@@ -25,5 +32,10 @@ namespace WikiFormsApp2
         public string Category { get => category; set => category = value; }
         public string Structure { get => structure; set => structure = value; }
         public string Definition { get => definition; set => definition = value; }
+
+        int IComparable<Information>.CompareTo(Information other)
+        {
+            return name.CompareTo(other.name);            
+        }
     }
 }
