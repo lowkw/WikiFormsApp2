@@ -68,6 +68,7 @@
             this.buttonDel.TabIndex = 1;
             this.buttonDel.Text = "DEL";
             this.buttonDel.UseVisualStyleBackColor = true;
+            this.buttonDel.Click += new System.EventHandler(this.buttonDel_Click);
             // 
             // buttonEdit
             // 
@@ -77,6 +78,7 @@
             this.buttonEdit.TabIndex = 2;
             this.buttonEdit.Text = "EDIT";
             this.buttonEdit.UseVisualStyleBackColor = true;
+            this.buttonEdit.Click += new System.EventHandler(this.buttonEdit_Click);
             // 
             // textBoxName
             // 
@@ -84,6 +86,7 @@
             this.textBoxName.Name = "textBoxName";
             this.textBoxName.Size = new System.Drawing.Size(121, 20);
             this.textBoxName.TabIndex = 3;
+            this.textBoxName.DoubleClick += new System.EventHandler(this.textBoxName_DoubleClick);
             // 
             // comboBoxCategory
             // 
@@ -141,8 +144,9 @@
             this.columnHeaderCategory});
             this.listView.HideSelection = false;
             this.listView.Location = new System.Drawing.Point(279, 41);
+            this.listView.MultiSelect = false;
             this.listView.Name = "listView";
-            this.listView.Size = new System.Drawing.Size(291, 377);
+            this.listView.Size = new System.Drawing.Size(236, 377);
             this.listView.TabIndex = 9;
             this.listView.UseCompatibleStateImageBehavior = false;
             this.listView.View = System.Windows.Forms.View.Details;
@@ -151,7 +155,7 @@
             // columnHeaderName
             // 
             this.columnHeaderName.Text = "Name";
-            this.columnHeaderName.Width = 100;
+            this.columnHeaderName.Width = 120;
             // 
             // columnHeaderCategory
             // 
@@ -200,6 +204,7 @@
             this.buttonSearch.TabIndex = 14;
             this.buttonSearch.Text = "Search";
             this.buttonSearch.UseVisualStyleBackColor = true;
+            this.buttonSearch.Click += new System.EventHandler(this.buttonSearch_Click);
             // 
             // buttonOpen
             // 
@@ -209,6 +214,7 @@
             this.buttonOpen.TabIndex = 15;
             this.buttonOpen.Text = "Open";
             this.buttonOpen.UseVisualStyleBackColor = true;
+            this.buttonOpen.Click += new System.EventHandler(this.buttonOpen_Click);
             // 
             // buttonSave
             // 
@@ -218,12 +224,13 @@
             this.buttonSave.TabIndex = 16;
             this.buttonSave.Text = "Save";
             this.buttonSave.UseVisualStyleBackColor = true;
+            this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
             // 
             // WikiFormsApp2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(582, 428);
+            this.ClientSize = new System.Drawing.Size(576, 436);
             this.Controls.Add(this.buttonSave);
             this.Controls.Add(this.buttonOpen);
             this.Controls.Add(this.buttonSearch);
@@ -241,6 +248,7 @@
             this.Controls.Add(this.buttonAdd);
             this.Name = "WikiFormsApp2";
             this.Text = "Data Structures Wiki";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.WikiFormsApp2_FormClosing);
             this.Load += new System.EventHandler(this.WikiFormsApp2_Load);
             this.groupBoxStructure.ResumeLayout(false);
             this.groupBoxStructure.PerformLayout();
