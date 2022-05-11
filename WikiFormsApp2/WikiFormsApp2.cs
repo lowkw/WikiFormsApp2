@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Diagnostics;
 
 namespace WikiFormsApp2
 {
@@ -16,7 +17,6 @@ namespace WikiFormsApp2
         #region globals
         // 6.2 Create a global List<T> of type Information called Wiki.
         List<Information> wikiList = new List<Information>();
-        String[] categoryArray = new String[] { "Array", "List", "Tree", "Graphs", "Abstract", "Hash" };
         #endregion globals
 
         #region forms
@@ -29,7 +29,26 @@ namespace WikiFormsApp2
         {
             //6.4 Create and initialise a global string array with the six categories as indicated in the Data Structure
             //Matrix. Create a custom method to populate the ComboBox when the Form Load method is called.
-            comboBoxCategory.DataSource = categoryArray;
+            //string[] categoryArray = new string[] { "Array", "List", "Tree", "Graphs", "Abstract", "Hash" };
+            try
+            {
+                string[] categoryArray = System.IO.File.ReadAllLines(@"category.txt");
+                comboBoxCategory.DataSource = categoryArray;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + "\nCannot open category.txt for reading.");
+            }
+            try
+            {
+                //Stream traceFile = File.Create("Trace.txt");
+                StreamWriter traceFile = File.AppendText("Trace.txt");
+                Trace.Listeners.Add(new TextWriterTraceListener(traceFile));                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + "\nCannot create the trace file.");
+            }
         }
 
         //6.15 The Wiki application will save data when the form closes.
@@ -42,6 +61,7 @@ namespace WikiFormsApp2
                 e.Cancel = true;
                 // Call method to save file...
                 SaveFile();
+                Trace.Close();
                 e.Cancel = false;
             }
         }
@@ -91,7 +111,7 @@ namespace WikiFormsApp2
                             wikiList[index].Category = comboBoxCategory.SelectedItem.ToString();
                             wikiList[index].Structure = SelectedRadioButton();
                             wikiList[index].Definition = textBoxDefinition.Text;
-                            
+
                         }
                     }
                     InitialiseInputs();
@@ -124,7 +144,7 @@ namespace WikiFormsApp2
                     {
                         foreach (int index in indexes)
                         {
-                            wikiList.RemoveAt(index);                            
+                            wikiList.RemoveAt(index);
                         }
                     }
                     InitialiseInputs();
@@ -146,9 +166,11 @@ namespace WikiFormsApp2
         private void buttonSearch_Click(object sender, EventArgs e)
         {
             Information infoName = new Information(textBoxSearch.Text);
-            wikiList.Sort();
+            wikiList.Sort();            
             if (wikiList.BinarySearch(infoName) >= 0)
             {
+                Trace.WriteLine(infoName.Name + " found.","Binary search ");
+                Trace.Flush();
                 int index = wikiList.FindIndex(x => x.Name == textBoxSearch.Text);
                 textBoxSearch.Clear();
                 listView.Items[index].Selected = true;
@@ -156,6 +178,8 @@ namespace WikiFormsApp2
             }
             else
             {
+                Trace.WriteLine(infoName.Name + " not found.", "Binary search ");
+                Trace.Flush();
                 textBoxSearch.Clear();
                 InitialiseInputs();
                 DisplayList();
@@ -178,6 +202,7 @@ namespace WikiFormsApp2
         {
             listView.Items.Clear();
             wikiList.Clear();
+            InitialiseInputs();
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.InitialDirectory = Application.StartupPath;
             openFileDialog.Title = "Open a BIN file";
@@ -190,35 +215,30 @@ namespace WikiFormsApp2
 
         private void OpenRecord(string openFileName)
         {
-            BinaryReader br;
             try
             {
-                br = new BinaryReader(new FileStream(openFileName, FileMode.Open));
+                using (var stream = File.Open(openFileName, FileMode.Open))
+                {
+                    using (var br = new BinaryReader(stream, Encoding.UTF8, false))
+                    {
+                        while (br.BaseStream.Position != br.BaseStream.Length)
+                        {
+                            Information newInformaion = new Information();
+                            newInformaion.Name = br.ReadString();
+                            newInformaion.Category = br.ReadString();
+                            newInformaion.Structure = br.ReadString();
+                            newInformaion.Definition = br.ReadString();
+                            wikiList.Add(newInformaion);
+                            listView.Items.Add(new ListViewItem(new[] { newInformaion.Name, newInformaion.Category }));
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message + "\nCannot open file for reading.");
                 return;
             }
-            while (br.BaseStream.Position != br.BaseStream.Length)
-            {
-                try
-                {
-                    Information newInformaion = new Information();
-                    newInformaion.Name = br.ReadString();
-                    newInformaion.Category = br.ReadString();
-                    newInformaion.Structure = br.ReadString();
-                    newInformaion.Definition = br.ReadString();
-                    wikiList.Add(newInformaion);
-                    listView.Items.Add(new ListViewItem(new[] { newInformaion.Name, newInformaion.Category }));
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message + "\nCannot read data from file or EOF.");
-                    return;
-                }
-            }
-            br.Close();
         }
 
         private void buttonSave_Click(object sender, EventArgs e)
@@ -228,6 +248,7 @@ namespace WikiFormsApp2
 
         private void SaveFile()
         {
+
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "BIN files|*.bin";
             saveFileDialog.Title = "Save a BIN file";
@@ -242,32 +263,29 @@ namespace WikiFormsApp2
 
         private void SaveRecord(string saveFileName)
         {
-            BinaryWriter bw;
             try
             {
-                bw = new BinaryWriter(new FileStream(saveFileName, FileMode.Create));
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message + "\nCannot append to file.");
-                return;
-            }
-            try
-            {
-                foreach (var datastructure in wikiList)
+                using (var stream = File.Open(saveFileName, FileMode.Create))
                 {
-                    bw.Write(datastructure.Name);
-                    bw.Write(datastructure.Category);
-                    bw.Write(datastructure.Structure);
-                    bw.Write(datastructure.Definition);
+                    using (var bw = new BinaryWriter(stream, Encoding.UTF8, false))
+                    {
+                        foreach (var datastructure in wikiList)
+                        {
+                            bw.Write(datastructure.Name);
+                            bw.Write(datastructure.Category);
+                            bw.Write(datastructure.Structure);
+                            bw.Write(datastructure.Definition);
+                        }
+                    }
                 }
+                InitialiseInputs();
+                DisplayList();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message + "\nCannot write data to file.");
                 return;
             }
-            bw.Close();
         }
         #endregion FileIO
 
@@ -291,7 +309,7 @@ namespace WikiFormsApp2
         }
 
         #region input validation
-        private Boolean ValidateInput()
+        private bool ValidateInput()
         {
             if (string.IsNullOrEmpty(textBoxName.Text))
             {
@@ -323,7 +341,7 @@ namespace WikiFormsApp2
         //6.5 Create a custom ValidName method which will take a parameter string value from the Textbox Name
         //and returns a Boolean after checking for duplicates. Use the built in List<T> method “Exists” to answer this
         //requirement.
-        private Boolean ValidName(String name)
+        private bool ValidName(string name)
         {
             return wikiList.Exists(x => x.Name == name);
         }
@@ -333,7 +351,7 @@ namespace WikiFormsApp2
         //6.6 Create two methods to highlight and return the values from the Radio button GroupBox. The first
         //method must return a string value from the selected radio button (Linear or Non-Linear). The second
         //method must send an integer index which will highlight an appropriate radio button.
-        private String SelectedRadioButton()
+        private string SelectedRadioButton()
         {
             if (radioButtonLinear.Checked == true)
             {
@@ -345,7 +363,7 @@ namespace WikiFormsApp2
             }
         }
 
-        private int FindRadioButtonIndex(String structureName)
+        private int FindRadioButtonIndex(string structureName)
         {
             if (structureName.Equals(radioButtonLinear.Text))
             {
