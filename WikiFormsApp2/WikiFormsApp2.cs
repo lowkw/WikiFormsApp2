@@ -54,6 +54,7 @@ namespace WikiFormsApp2
         //6.15 The Wiki application will save data when the form closes.
         private void WikiFormsApp2_FormClosing(Object sender, FormClosingEventArgs e)
         {
+            toolStripStatusLabel1.Text = "";
             if (MessageBox.Show("Do you want to save changes to a file?", "Wiki Application",
                 MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
@@ -72,6 +73,7 @@ namespace WikiFormsApp2
         //the Category, Radio group for the Structure and Multiline TextBox for the Definition.
         private void buttonAdd_Click(object sender, EventArgs e)
         {
+            toolStripStatusLabel1.Text = "";
             if (ValidateInput())
             {
                 Information newInformaion = new Information();
@@ -90,6 +92,7 @@ namespace WikiFormsApp2
         //sorted list at the end of this process.
         private void buttonEdit_Click(object sender, EventArgs e)
         {
+            toolStripStatusLabel1.Text = "";
             if (IsHandleCreated)
             {
                 ListView.SelectedIndexCollection indexes = listView.SelectedIndices;
@@ -129,6 +132,7 @@ namespace WikiFormsApp2
         //at the end of this process.
         private void buttonDel_Click(object sender, EventArgs e)
         {
+            toolStripStatusLabel1.Text = "";
             if (IsHandleCreated)
             {
                 ListView.SelectedIndexCollection indexes = listView.SelectedIndices;
@@ -165,12 +169,13 @@ namespace WikiFormsApp2
         //the ListView.At the end of the search process the search input TextBox must be cleared.
         private void buttonSearch_Click(object sender, EventArgs e)
         {
+            toolStripStatusLabel1.Text = "";
             Information infoName = new Information(textBoxSearch.Text);
             wikiList.Sort();            
             if (wikiList.BinarySearch(infoName) >= 0)
             {
                 Trace.WriteLine(infoName.Name + " found.","Binary search ");
-                Trace.Flush();
+                Trace.Flush();                
                 int index = wikiList.FindIndex(x => x.Name == textBoxSearch.Text);
                 textBoxSearch.Clear();
                 listView.Items[index].Selected = true;
@@ -179,11 +184,12 @@ namespace WikiFormsApp2
             else
             {
                 Trace.WriteLine(infoName.Name + " not found.", "Binary search ");
-                Trace.Flush();
+                Trace.Flush();                
                 textBoxSearch.Clear();
                 InitialiseInputs();
                 DisplayList();
-            }
+                toolStripStatusLabel1.Text = "Search not found";
+            }            
         }
         #endregion binary search
 
@@ -199,7 +205,7 @@ namespace WikiFormsApp2
         //6.14 Create two buttons for the manual open and save option; this must use a dialog box to select a file or
         //rename a saved file. All Wiki data is stored/retrieved using a binary file format.
         private void buttonOpen_Click(object sender, EventArgs e)
-        {
+        {            
             listView.Items.Clear();
             wikiList.Clear();
             InitialiseInputs();
@@ -243,6 +249,7 @@ namespace WikiFormsApp2
 
         private void buttonSave_Click(object sender, EventArgs e)
         {
+            toolStripStatusLabel1.Text = "";
             SaveFile();
         }
 
@@ -293,6 +300,7 @@ namespace WikiFormsApp2
         //associated information will be displayed in the related text boxes combo box and radio button.
         private void listView_SelectedIndexChanged(object sender, EventArgs e)
         {
+            toolStripStatusLabel1.Text = "";
             ListView.SelectedIndexCollection indexes = listView.SelectedIndices;
             foreach (int index in indexes)
             {
@@ -384,6 +392,7 @@ namespace WikiFormsApp2
             radioButtonLinear.Checked = false;
             radioButtonNonLinear.Checked = false;
             textBoxDefinition.Clear();
+            toolStripStatusLabel1.Text = "";
         }
 
         //6.9 Create a single custom method that will sort and then display the Name and Category from the wiki
@@ -391,11 +400,16 @@ namespace WikiFormsApp2
         private void DisplayList()
         {
             listView.Items.Clear();
-            wikiList.Sort();
+            wikiList.Sort();            
             foreach (var datastructure in wikiList)
             {
                 listView.Items.Add(new ListViewItem(new[] { datastructure.Name, datastructure.Category }));
-            }
+            }            
+        }
+
+        private void textBoxName_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = !char.IsLetter(e.KeyChar);
         }
     }
 }
